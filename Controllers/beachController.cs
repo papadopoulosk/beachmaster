@@ -27,7 +27,12 @@ namespace beachmaster.Controllers
             if (id != 0) {
                 var reviews = storedB.review.Where(i => i.beachId == id).OrderByDescending(i => i.reviewDate);
                 ViewBag.beach = storedB.beach.Find(id);
+
+                var img = storedB.beach.Where(i => i.beachId == id).Select(x => x.imagePath).First();
+
+                ViewBag.imgPath = img;
                 return View(reviews);
+
             } else {
                 return RedirectToAction("index", "home");
             }
@@ -38,16 +43,46 @@ namespace beachmaster.Controllers
         public string DetailsAsync(int data)
         {
             var beach = storedB.beach.Where(i => i.beachId == data).First();
-            string json = "{\"beachId\":" + beach.beachId.ToString() + ",\"name\":\"" + beach.name + "\",\"description\":\"" + beach.description + "\",\"rate\":\"" + beach.rate + "\"}";
+            string json = "{\"beachId\":" + beach.beachId.ToString() + ",\"name\":\"" + beach.name + "\",\"description\":\"" + beach.description + "\",\"rate\":\"" + beach.rate + "\",\"img\":\"" + beach.imagePath + "\"}";
 
             return json;
         }
 
-        public ActionResult findNeighbors(double lat, double lon)
+        //Problem with Double/String conversion/comparison... Postponed.. :(
+        public string findNeighbors(string lat, string lon)
         {
-            var beach = storedB.beach.Where(i => Convert.ToDouble(i.longitude) < lon).
-                Where(i => Convert.ToDouble(i.latitude) < lat);
-            return View(beach.Count());
+
+            //decimal latDL = Convert.ToDecimal(lat);
+            //string str = String.Format("{0:0,00000000000000000000000}", lat);
+            //decimal test = Convert.ToDecimal(str);
+            //decimal lonDL = Convert.ToDecimal(lon);
+            /*
+            decimal maxRatio = 1.005M / 100000000000000;
+            decimal minRatio = 0.995M / 100000000000000;
+
+            decimal latMax = latDL * maxRatio;
+            decimal latMin = latDL * minRatio;
+            decimal lonMax = lonDL * maxRatio;
+            decimal lonMin = lonDL * minRatio;
+            */
+            var beach = storedB.beach.
+                //Where(i => i.latitude < lat).
+                //Where(i => i.latitude > lat).
+                //Where(i => i.longitude < lon).
+                //Where(i => i.longitude > lon).
+                ToList();
+
+            string json = "[";
+            foreach (var b in beach)
+            {
+                json = json + "{\"beachId\":" + b.beachId.ToString() + ",\"name\":\"" + b.name + "\"},";
+            }
+            json = json.TrimEnd(',');
+            json = json + "]";
+            
+
+            return json;
+            //return lat;
         }
 
 
@@ -73,7 +108,8 @@ namespace beachmaster.Controllers
                     latitude = beach.latitude, 
                     longitude = beach.longitude, 
                     description = beach.description,
-                    approved = false                  
+                    approved = false,
+                    imagePath = beach.imagePath
                 };
                 storedB.beach.Add(newBeach);
                 storedB.SaveChanges();

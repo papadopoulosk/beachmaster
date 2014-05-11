@@ -22,7 +22,7 @@ namespace beachmaster.Models
         public float rate { get; set; } //rating of the beach
         public int votes { get; set; } // number of votes so as to approve the beach by admin
         public bool approved { get; set; } //if this is true, the beach is approved by the admin, otherwise it is still pending
-        //public string imagePath { get; set; }
+        public string imagePath { get; set; } //Url to store link to beach.. Not yet to upload image..
         //public double Brate { get; set; }
 
         public int totalRates { get; set; }

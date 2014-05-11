@@ -32,17 +32,18 @@
             </ul>
         </div>
         <div class="span3" id="beachPreview">
-            <div class="media">
-                  <a class="pull-left" href='@Url.Action("Details", "beach")'><img class="media-object thumbnail" src="http://placehold.it/60x60"></a>
+            <div class="row">
+                  <a class="span3" href='@Url.Action("Details", "beach")'><img class="media-object thumbnail" src="http://placehold.it/60x60"></a>
+            </div>
+            <hr />
+            <div class="row-fluid">      
                   <div class="media-body">
                     <h4 class="media-heading">Media heading</h4>
                     <p>Select a beach to display data</p>
                     @Html.ActionLink("View more", "Details", "beach", null, new { @class = "btn btn-small moreBeachDetails" })
-                    
                   </div>
             </div>
         </div>
-    </div>
 </div>
 
 <div class="row">
@@ -60,61 +61,16 @@
   </div>
     <div class="modal-body">
             @Html.Partial("~/Views/beach/CreateForm.cshtml", new beachmaster.Models.beach { })
+            <!-- Section for neighbor beachs.. To be done.
+            <div id="neighbors"></div>
+            -->
+            
     </div>
   <div class="modal-footer">
     <p>Your information will be proceeded. We may propose additional beaches to check them!</p> 
   </div>
 </div>
 
-
-
-
-<!-- Modal -->
-<!-- TO BE DELETED AFTER PARTIAL WORKS PERFECTLY
-<div id="myModalaaa" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">New Beach?! Go on!</h3>
-  </div>
-  <div class="modal-body">
-    <form action="/beach/create" method="post">    <fieldset>
-        <legend>Check the details you want to provide so as to proceed!</legend>
-
-        <div class="editor-label">
-            <label for="name">name</label>
-        </div>
-        <div class="editor-field">
-            <input class="text-box single-line" id="name" name="name" type="text" value="" />
-            <span class="field-validation-valid" data-valmsg-for="name" data-valmsg-replace="true"></span>
-        </div>
-
-        <div class="editor-label">
-            <label for="latitude">latitude</label>
-        </div>
-        <div class="editor-field">
-            <input class="text-box single-line" id="latitude" name="latitude" type="text" value="" />
-            <span class="field-validation-valid" data-valmsg-for="latitude" data-valmsg-replace="true"></span>
-        </div>
-
-        <div class="editor-label">
-            <label for="longitude">longitude</label>
-        </div>
-        <div class="editor-field">
-            <input class="text-box single-line" id="longitude" name="longitude" type="text" value="" />
-            <span class="field-validation-valid" data-valmsg-for="longitude" data-valmsg-replace="true"></span>
-        </div>
-        <p>
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <input class="btn btn-primary" type="submit" value="Create" />
-        </p>
-    </fieldset>
-        </form>
-  </div>
-  <div class="modal-footer">
-    <p>Your information will be proceeded. We may propose additional beaches to check them!</p> 
-  </div>
-</div>
--->
 <script type="text/javascript">
     var map;
     $(document).ready(function () {
@@ -156,7 +112,7 @@
                 lng: points[point].longitude,
                 title: points[point].name,
                 click: function(e) {
-                    //alert('You clicked in this marker');
+                    //Action on click
                 },
                  infoWindow: {
                 content : "<p>"+points[point].name+"</p></p><a href='beach/Details/"+points[point].beachId+"'>More..</a></p>"
@@ -167,36 +123,43 @@
         GMaps.on('click', map.map, function(event) {
             //alert(event.latLng.lat() + " + " + event.latLng.lng());
             var index = map.markers.length;
-            var lat = event.latLng.lat();
-            var lng = event.latLng.lng();
+            var latit = event.latLng.lat();
+            var longt = event.latLng.lng();
 
             //var template = $('#edit_marker_template').text();
 
             //var content = template.replace(/{{index}}/g, index).replace(/{{lat}}/g, lat).replace(/{{lng}}/g, lng);
 
             map.addMarker({
-                lat: lat,
-                lng: lng,
+                lat: latit,
+                lng: longt,
                 title: 'New Marker'
                 //infoWindow: {
                 //    content : "ASD"
                 //}
             });
             
-            $("#latitude").val(lat);
-            $("#longitude").val(lng);
+            $("#latitude").val(latit);
+            $("#longitude").val(longt);
             $('#myModal').modal('show');
-            /**
+
+    /* Not functional aspect of neighbor beaches..
             $.ajax({
                 type: "POST",
-                url: "/beach/Create/",
-                data: {name:"new",latitude:lat,longitude:lng},
-                success: function (value){
-                    //JS to trigger modal on click event
-                    //alert("Help 2");
+                url: "/beach/findNeighbors/",
+                data: {lat: latit , lon: longt },
+                success: function (json){
+                    var html = '<div class="media">';
+                    $.each($.parseJSON(json), function(idx, obj) {
+	                    html = html + '<div class="media-body"><p class="media-heading">'+obj.name +'</p>';
+                        html = html + '</p><a href="beach/Details/'+ obj.beachId +'">Check this first!</a></p>';
+                        html = html + '</div>';
+                   });
+                   html = html + '</div>';
+                    $('#neighbors').html(html);
                 }
             });
-            **/
+    End of comment */
                     
          });
 
@@ -236,7 +199,8 @@
                    // $("#beachPreview").html('<img src="../Content/beachimages/beach.jpg" class="img-rounded">');
                     $("#beachPreview div div h4").html(json.name + " <span class='badge badge-info'>" + json.rate + "</span>");
                     $("#beachPreview div div p").html(json.description);
-                    
+                    $("#beachPreview div a img").attr("src",json.img);
+                    $("#beachPreview div a").attr("href", _href + '/'+json.beachId);
                     $(".moreBeachDetails").attr("href", _href + '/'+json.beachId);
                 }
             });

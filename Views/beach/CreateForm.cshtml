@@ -23,6 +23,15 @@
             @Html.ValidationMessageFor(model => model.description)
         </div>
 
+        <div class="editor-label">
+            @Html.LabelFor(model => model.imagePath)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.imagePath)
+            @Html.ValidationMessageFor(model => model.imagePath)
+        </div>
+        
+        
         <div class="editor-label hidden">
             @Html.LabelFor(model => model.latitude)
         </div>

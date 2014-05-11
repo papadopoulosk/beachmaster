@@ -213,3 +213,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.asax
+Global.asax.cs
+Web.Debug.config
+*.config
+beachmaster.csproj
+Properties/AssemblyInfo.cs
