@@ -1,0 +1,81 @@
+﻿@model IEnumerable<beachmaster.Models.review>
+
+@{
+    ViewBag.Title = "Current Reviews";
+}
+
+
+<div class="row-fluid">
+    <div class="span10 offset1">
+    <h2>Current Reviews</h2>
+
+        <div class="row">
+            <div class="span6">
+                <p>In order to sumbmit new reviews for the beach please @Html.ActionLink("Click here!", "addReview", "beach", new { beachId = @ViewBag.beach.beachId }, new { @class = "btn btn-primary" })</p>
+                <div class="btn-group">
+                  <button id="click" class="btn ratebtn" rate="1">1</button>
+                  <button class="btn ratebtn" rate="2">2</button>
+                  <button class="btn ratebtn" rate="3">3</button>
+                  <button class="btn ratebtn" rate="4">4</button>
+                  <button class="btn ratebtn" rate="5">5</button>
+                </div>
+            </div>
+            <div class="span6">
+                <div id="msgBox">
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="span6">
+                <table class="table table-striped">
+                <tr><th>Title</th><th>Text</th><th>Date</th></tr>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.text)
+                        </td>
+                        <td>
+                             @Html.DisplayFor(modelItem => item.reviewDate.Day)/@Html.DisplayFor(modelItem => item.reviewDate.Month)/@Html.DisplayFor(modelItem => item.reviewDate.Year)
+                        </td>
+                    </tr>
+                }
+                </table>
+            </div>
+            <div class="span6">
+                <img src="@Url.Content("~/Content/beachimages/beach.jpg")" class="img-polaroid" />
+                <div id="map" class="img-polaroid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".ratebtn").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/beach/submitRate/",
+                    data: { rate: $(this).attr("rate") },
+                    success: function (value) {
+                        if (value != "Not Ok") {
+                            $("#msgBox").fadeIn().html('<div id="alertBox"class="alert alert-info"><strong>'+value+'</strong>.</div>');
+                        //$("#alertBox").delay(750).fadeOut("slow");
+                        } else {
+                            $("#msgBox").fadeIn().html('<div id="alertBox"class="alert alert"><strong>Error Occured</strong>.</div>');
+                        }
+                    }
+                });
+            });
+
+      var url = GMaps.staticMapURL({
+        //size: [610, 350],
+        lat: @ViewBag.beach.latitude,
+        lng: @ViewBag.beach.longitude,
+        markers: [
+          {lat: @ViewBag.beach.latitude, lng: @ViewBag.beach.longitude}
+        ]
+      });
+      $('<img/>').attr('src', url).appendTo('#map');
+</script>

@@ -1,0 +1,13 @@
+﻿@model IEnumerable<beachmaster.Models.beach>
+
+<ul class="thumbnails">
+                @foreach (var item in Model) {
+                            <li class="span2">
+                                <div class="">
+                                    <p>@item.name</p>
+                                    @Html.ActionLink("Preview (" + @item.numReviews + ") - " + @item.rate + "/5", "Details", "beach", new { id = item.beachId }, new { @beachid = item.beachId, @class = "btn btn-small detailsLink" })
+                                    <a href="#" class="RemoveLink btn btn-small btn-warning" data-id="@item.beachId">Remove</a>
+                                </div>
+                            </li>
+                }
+</ul>

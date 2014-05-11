@@ -1,0 +1,245 @@
+﻿@model IEnumerable<beachmaster.Models.beach>
+
+@{
+    ViewBag.Title = "BeachMaster";
+}
+
+<div class="row">
+    <div class="span10 offset1">
+        <div class="span10">
+            <div id="map"></div>    
+           
+        </div>
+        
+    </div>
+</div>
+
+<div class="row">
+    <div class="span10 offset1">
+      <hr />
+        <div class="span6">
+       
+            <ul class="thumbnails">
+                @foreach (var item in Model) {
+                            <li class="span2">
+                                <div class="">
+                                    <p>@item.name</p>
+                                    @Html.ActionLink("Preview (" + @item.numReviews + ") - " + @item.rate + "/5", "Details", "beach", new { id = item.beachId }, new { @beachid = item.beachId, @class = "btn btn-small detailsLink" })
+                                    <a href="#" class="RemoveLink btn btn-small btn-warning" data-id="@item.beachId">Remove</a>
+                                </div>
+                            </li>
+                }
+            </ul>
+        </div>
+        <div class="span3" id="beachPreview">
+            <div class="media">
+                  <a class="pull-left" href='@Url.Action("Details", "beach")'><img class="media-object thumbnail" src="http://placehold.it/60x60"></a>
+                  <div class="media-body">
+                    <h4 class="media-heading">Media heading</h4>
+                    <p>Select a beach to display data</p>
+                    @Html.ActionLink("View more", "Details", "beach", null, new { @class = "btn btn-small moreBeachDetails" })
+                    
+                  </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="span10 offset1">
+        
+    </div>
+</div>
+
+
+<!-- Modal from partial View -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">New Beach?! Go on!</h3>
+  </div>
+    <div class="modal-body">
+            @Html.Partial("~/Views/beach/CreateForm.cshtml", new beachmaster.Models.beach { })
+    </div>
+  <div class="modal-footer">
+    <p>Your information will be proceeded. We may propose additional beaches to check them!</p> 
+  </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<!-- TO BE DELETED AFTER PARTIAL WORKS PERFECTLY
+<div id="myModalaaa" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">New Beach?! Go on!</h3>
+  </div>
+  <div class="modal-body">
+    <form action="/beach/create" method="post">    <fieldset>
+        <legend>Check the details you want to provide so as to proceed!</legend>
+
+        <div class="editor-label">
+            <label for="name">name</label>
+        </div>
+        <div class="editor-field">
+            <input class="text-box single-line" id="name" name="name" type="text" value="" />
+            <span class="field-validation-valid" data-valmsg-for="name" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="editor-label">
+            <label for="latitude">latitude</label>
+        </div>
+        <div class="editor-field">
+            <input class="text-box single-line" id="latitude" name="latitude" type="text" value="" />
+            <span class="field-validation-valid" data-valmsg-for="latitude" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="editor-label">
+            <label for="longitude">longitude</label>
+        </div>
+        <div class="editor-field">
+            <input class="text-box single-line" id="longitude" name="longitude" type="text" value="" />
+            <span class="field-validation-valid" data-valmsg-for="longitude" data-valmsg-replace="true"></span>
+        </div>
+        <p>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <input class="btn btn-primary" type="submit" value="Create" />
+        </p>
+    </fieldset>
+        </form>
+  </div>
+  <div class="modal-footer">
+    <p>Your information will be proceeded. We may propose additional beaches to check them!</p> 
+  </div>
+</div>
+-->
+<script type="text/javascript">
+    var map;
+    $(document).ready(function () {
+        map = new GMaps({
+            el: '#map',
+            lat: -12.043333,
+            lng: -77.028333,
+            width: '100%',
+            height: '450px',
+            zoomControl: true,
+            zoomControlOpt: {
+                style: 'SMALL',
+                position: 'TOP_LEFT'
+            },
+            panControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            overviewMapControl: false
+        });
+
+        GMaps.geolocate({
+            success: function (position) {
+                map.setCenter(position.coords.latitude, position.coords.longitude);
+            },
+            error: function (error) {
+                alert('Geolocation failed: ' + error.message);
+            },
+            not_supported: function () {
+                alert("Your browser does not support geolocation");
+            }
+        });
+
+        var points = @Html.Raw(Json.Encode(Model));
+    
+        for (var point in points) {
+            // alert(points[point].beachId);
+            map.addMarker({
+                lat: points[point].latitude,
+                lng: points[point].longitude,
+                title: points[point].name,
+                click: function(e) {
+                    //alert('You clicked in this marker');
+                },
+                 infoWindow: {
+                content : "<p>"+points[point].name+"</p></p><a href='beach/Details/"+points[point].beachId+"'>More..</a></p>"
+                }
+            });
+        }
+
+        GMaps.on('click', map.map, function(event) {
+            //alert(event.latLng.lat() + " + " + event.latLng.lng());
+            var index = map.markers.length;
+            var lat = event.latLng.lat();
+            var lng = event.latLng.lng();
+
+            //var template = $('#edit_marker_template').text();
+
+            //var content = template.replace(/{{index}}/g, index).replace(/{{lat}}/g, lat).replace(/{{lng}}/g, lng);
+
+            map.addMarker({
+                lat: lat,
+                lng: lng,
+                title: 'New Marker'
+                //infoWindow: {
+                //    content : "ASD"
+                //}
+            });
+            
+            $("#latitude").val(lat);
+            $("#longitude").val(lng);
+            $('#myModal').modal('show');
+            /**
+            $.ajax({
+                type: "POST",
+                url: "/beach/Create/",
+                data: {name:"new",latitude:lat,longitude:lng},
+                success: function (value){
+                    //JS to trigger modal on click event
+                    //alert("Help 2");
+                }
+            });
+            **/
+                    
+         });
+
+         $(".RemoveLink").click(function (e) {
+            e.preventDefault();
+            var recordToDelete = $(this).attr("data-id");
+            if (recordToDelete != '') {
+                // Perform the ajax post
+                $.post("/beach/Delete", {"id": recordToDelete },
+                    function (data) {
+                        // Successful requests get here
+                        // Update the page elements
+                        /*if (data.ItemCount == 0) {
+                            $('#row-' + data.DeleteId).fadeOut('slow');
+                        } else {
+                            $('#item-count-' + data.DeleteId).text(data.ItemCount);
+                        }
+                        $('#cart-total').text(data.CartTotal);
+                        $('#update-message').text(data.Message);
+                        $('#cart-status').text('Cart (' + data.CartCount + ')');*/
+                 });
+            }
+         })
+
+         var _href = $(".moreBeachDetails").attr("href");
+         
+         $(".detailsLink").click(function(e) {
+            e.preventDefault();
+            //alert($(this).attr("beachid"));
+            $.ajax({
+                type: "GET",
+                url: "/beach/DetailsAsync/",
+                data: {"data":$(this).attr("beachid")},
+                success: function (value){
+                    //JS to trigger modal on click event
+                    var json = $.parseJSON(value);
+                   // $("#beachPreview").html('<img src="../Content/beachimages/beach.jpg" class="img-rounded">');
+                    $("#beachPreview div div h4").html(json.name + " <span class='badge badge-info'>" + json.rate + "</span>");
+                    $("#beachPreview div div p").html(json.description);
+                    
+                    $(".moreBeachDetails").attr("href", _href + '/'+json.beachId);
+                }
+            });
+         });
+    });
+</script> 
