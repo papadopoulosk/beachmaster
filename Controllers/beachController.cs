@@ -193,6 +193,7 @@ namespace beachmaster.Controllers
             if (ModelState.IsValid)
             {
                 //var newBeach = new beachmaster.Models.beach { name = beach.name, latitude = beach.latitude, longitude = beach.longitude };
+                review.reviewDate = DateTime.Now;
                 storedB.review.Add(review);
                 storedB.SaveChanges();
                 return RedirectToAction("Details", "beach", new { id = review.beachId });

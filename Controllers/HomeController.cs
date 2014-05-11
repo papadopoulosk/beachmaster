@@ -21,11 +21,11 @@ namespace beachmaster
             storedB.beach.Add(beach1);
             storedB.beach.Add(beach2);
             storedB.SaveChanges();*/
-
+            /*
             var query = "SELECT beaches.beachId, COUNT(reviews.reviewId) AS Count "
                         + "FROM reviews INNER JOIN beaches ON reviews.beachId = beaches.beachId "
                         + "GROUP BY beaches.beachId;";
-
+            */
             var beach = storedB.beach;
             var Rreview = storedB.review;
 

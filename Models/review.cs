@@ -17,6 +17,7 @@ namespace beachmaster.Models
         [Required]
         public System.DateTime reviewDate { get; set; }
         [Required]
+        [DataType(DataType.MultilineText)]
         public string text { get; set; }
     }
 }

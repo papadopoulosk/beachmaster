@@ -33,7 +33,7 @@
         </div>
         <div class="span3" id="beachPreview">
             <div class="row">
-                  <a class="span3" href='@Url.Action("Details", "beach")'><img class="media-object thumbnail" src="http://placehold.it/60x60"></a>
+                  <a class="span3" href='@Url.Action("Details", "beach")'><img class="media-object thumbnail" src="http://placehold.it/200x200"></a>
             </div>
             <hr />
             <div class="row-fluid">      
@@ -197,6 +197,7 @@
                     //JS to trigger modal on click event
                     var json = $.parseJSON(value);
                    // $("#beachPreview").html('<img src="../Content/beachimages/beach.jpg" class="img-rounded">');
+                    $("#beachPreview").fadeTo('slow', 2);
                     $("#beachPreview div div h4").html(json.name + " <span class='badge badge-info'>" + json.rate + "</span>");
                     $("#beachPreview div div p").html(json.description);
                     $("#beachPreview div a img").attr("src",json.img);
